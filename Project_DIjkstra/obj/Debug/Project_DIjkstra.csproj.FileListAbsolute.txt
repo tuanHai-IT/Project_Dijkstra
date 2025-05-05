@@ -1,0 +1,10 @@
+D:\C# code\Project_DIjkstra\Project_DIjkstra\bin\Debug\Project_DIjkstra.exe.config
+D:\C# code\Project_DIjkstra\Project_DIjkstra\bin\Debug\Project_DIjkstra.exe
+D:\C# code\Project_DIjkstra\Project_DIjkstra\bin\Debug\Project_DIjkstra.pdb
+D:\C# code\Project_DIjkstra\Project_DIjkstra\obj\Debug\Project_DIjkstra.csproj.AssemblyReference.cache
+D:\C# code\Project_DIjkstra\Project_DIjkstra\obj\Debug\Project_DIjkstra.Form1.resources
+D:\C# code\Project_DIjkstra\Project_DIjkstra\obj\Debug\Project_DIjkstra.Properties.Resources.resources
+D:\C# code\Project_DIjkstra\Project_DIjkstra\obj\Debug\Project_DIjkstra.csproj.GenerateResource.cache
+D:\C# code\Project_DIjkstra\Project_DIjkstra\obj\Debug\Project_DIjkstra.csproj.CoreCompileInputs.cache
+D:\C# code\Project_DIjkstra\Project_DIjkstra\obj\Debug\Project_DIjkstra.exe
+D:\C# code\Project_DIjkstra\Project_DIjkstra\obj\Debug\Project_DIjkstra.pdb
