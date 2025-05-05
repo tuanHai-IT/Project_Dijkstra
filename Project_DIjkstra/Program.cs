@@ -780,7 +780,7 @@ namespace LANNetworkSimulation
 
                 if (cboSource.SelectedItem.ToString() == cboDestination.SelectedItem.ToString())
                 {
-                    txtResult.Text = "Thiết bị bị trùng lặp";
+                    txtResult.Text = "Trùng lặp thiết bị";
                     return;
                 }
 
@@ -972,7 +972,7 @@ namespace LANNetworkSimulation
             var student1 = network.AddDevice("Sinh viên 1", DeviceType.Computer, new Point(150, 300));
             var student2 = network.AddDevice("Sinh viên 2", DeviceType.Computer, new Point(350, 350));
             var student3 = network.AddDevice("Sinh viên 3", DeviceType.Computer, new Point(550, 300));
-            var student4 = network.AddDevice("Sinh viên 4", DeviceType.Computer, new Point(650, 150));
+            //var student4 = network.AddDevice("Sinh viên 4", DeviceType.Computer, new Point(650, 150));
 
             // Tạo các kết nối
             network.AddConnection(teacher, switch1, 100, 2);
@@ -980,7 +980,7 @@ namespace LANNetworkSimulation
             network.AddConnection(switch1, router, 100, 5);
             network.AddConnection(switch2, switch3, 1000, 1);
             network.AddConnection(switch2, router, 100, 3);
-            network.AddConnection(switch3, student4, 100, 2);
+            //network.AddConnection(switch3, student4, 100, 2);
             network.AddConnection(switch3, router, 100, 4);
             network.AddConnection(router, student1, 100, 3);
             network.AddConnection(router, student2, 100, 2);
