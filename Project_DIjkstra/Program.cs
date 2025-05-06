@@ -963,7 +963,7 @@ namespace LANNetworkSimulation
 
         private void CreateSampleNetwork(Network network)
         {
-            // Tạo các thiết bị
+            // Tạo các thiết bị trên Panel
             var teacher = network.AddDevice("Giảng Viên", DeviceType.Computer, new Point(50, 50));
             var switch1 = network.AddDevice("Switch 1", DeviceType.Switch, new Point(200, 50));
             var switch2 = network.AddDevice("Switch 2", DeviceType.Switch, new Point(350, 150));
