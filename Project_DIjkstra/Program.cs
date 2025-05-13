@@ -881,7 +881,7 @@ namespace LANNetworkSimulation
 
                 if (cboSource.SelectedItem.ToString() == cboDestination.SelectedItem.ToString())
                 {
-                    txtResult.Text = "Trùng lặp thiết bị";
+                    MessageBox.Show("Trùng lặp thiết bị", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
