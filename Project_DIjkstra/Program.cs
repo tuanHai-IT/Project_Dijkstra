@@ -63,13 +63,13 @@ namespace LANNetworkSimulation
         public int Id { get; set; }
         public Device Source { get; set; }
         public Device Destination { get; set; }
-        public double Bandwidth { get; set; } // Mbps
-        public double Latency { get; set; }   // ms
+        public double Bandwidth { get; set; }
+        public double Latency { get; set; }
         public bool IsHighlighted { get; set; } = false;
 
         public double CalculateTransferTime(double fileSize)
         {
-            return Latency + (fileSize * 8 / Bandwidth * 1000); // Kết quả tính bằng ms
+            return Latency + (fileSize * 8 / Bandwidth * 1000);
         }
 
         public void Draw(Graphics g)
@@ -85,7 +85,6 @@ namespace LANNetworkSimulation
                 Destination.Position.X + Destination.Size.Width / 2,
                 Destination.Position.Y + Destination.Size.Height / 2);
 
-            // Vẽ đường kết nối
             g.DrawLine(pen, sourceCenter, destCenter);
 
             // Hiển thị thông tin băng thông và độ trễ
@@ -105,8 +104,14 @@ namespace LANNetworkSimulation
         private int nextDeviceId = 1;
         private int nextConnectionId = 1;
 
+        // Kiểm tra tên thiết bị
         public Device AddDevice(string name, DeviceType type, Point position)
         {
+            if (Devices.Any(d => d.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            {
+                return null;
+            }
+
             var device = new Device
             {
                 Id = nextDeviceId++,
@@ -121,7 +126,6 @@ namespace LANNetworkSimulation
 
         public void RemoveDevice(Device device)
         {
-            // Xóa các kết nối liên quan
             var relatedConnections = Connections
                 .Where(c => c.Source == device || c.Destination == device)
                 .ToList();
@@ -136,7 +140,6 @@ namespace LANNetworkSimulation
 
         public Connection AddConnection(Device source, Device destination, double bandwidth, double latency)
         {
-            // Kiểm tra kết nối đã tồn tại chưa
             if (Connections.Any(c =>
                 (c.Source == source && c.Destination == destination) ||
                 (c.Source == destination && c.Destination == source)))
@@ -164,13 +167,11 @@ namespace LANNetworkSimulation
 
         public void Draw(Graphics g)
         {
-            // Vẽ các kết nối trước
             foreach (var connection in Connections)
             {
                 connection.Draw(g);
             }
 
-            // Sau đó vẽ các thiết bị
             foreach (var device in Devices)
             {
                 device.Draw(g);
@@ -185,13 +186,8 @@ namespace LANNetworkSimulation
         // Thuật toán Dijkstra để tìm đường đi ngắn nhất
         public List<Device> FindShortestPath(Device source, Device destination)
         {
-            // Dictionary để lưu khoảng cách từ nguồn đến mỗi thiết bị
             Dictionary<Device, double> distances = new Dictionary<Device, double>();
-
-            // Dictionary để lưu thiết bị trước đó trong đường đi ngắn nhất
             Dictionary<Device, Device> previousDevices = new Dictionary<Device, Device>();
-
-            // Danh sách các thiết bị chưa xét
             List<Device> unvisited = new List<Device>();
 
             // Khởi tạo
@@ -219,7 +215,6 @@ namespace LANNetworkSimulation
                     }
                 }
 
-                // Nếu không tìm thấy thiết bị nào mới (không còn đường đi) hoặc tìm thấy đích
                 if (current == null || current == destination || distances[current] == double.MaxValue)
                     break;
 
@@ -248,7 +243,6 @@ namespace LANNetworkSimulation
             List<Device> path = new List<Device>();
             Device currentDevice = destination;
 
-            // Nếu không tìm thấy đường đi
             if (previousDevices[destination] == null && destination != source)
                 return path;
 
@@ -266,7 +260,6 @@ namespace LANNetworkSimulation
         {
             double totalTime = 0;
 
-            // Reset highlighting
             foreach (var connection in Connections)
             {
                 connection.IsHighlighted = false;
@@ -290,7 +283,7 @@ namespace LANNetworkSimulation
 
         public Connection GetConnectionAt(Point point)
         {
-            const int clickTolerance = 5; // Độ chính xác của click chuột
+            const int clickTolerance = 5;
 
             foreach (var connection in Connections)
             {
@@ -343,7 +336,6 @@ namespace LANNetworkSimulation
         private bool isDraggingDevice = false;
         private Point dragOffset;
 
-        // Thêm các control cho việc cập nhật
         private TextBox txtDeviceName;
         private ComboBox cboDeviceType;
         private TextBox txtBandwidth;
@@ -392,13 +384,12 @@ namespace LANNetworkSimulation
             };
             this.Controls.Add(resultPanel);
 
-            // Các control trong Panel điều khiển
             int y = 10;
 
             Button btnReset = new Button
             {
                 Text = "Reset Mạng",
-                Location = new Point(10, 560), // Di chuyển xuống dưới trong panel điều khiển
+                Location = new Point(10, 560),
                 Size = new Size(280, 30),
                 BackColor = Color.Red,
                 ForeColor = Color.White,
@@ -411,7 +402,7 @@ namespace LANNetworkSimulation
             {
                 Text = "Quản lý thiết bị",
                 Location = new Point(10, y),
-                Size = new Size(280, 160), // Tăng kích thước để chứa nút cập nhật
+                Size = new Size(280, 160),
                 BackColor = Color.White
             };
             controlPanel.Controls.Add(deviceGroup);
@@ -466,7 +457,6 @@ namespace LANNetworkSimulation
             };
             deviceGroup.Controls.Add(btnRemoveDevice);
 
-            // Thêm nút cập nhật thiết bị
             btnUpdateDevice = new Button
             {
                 Text = "Cập nhật thiết bị",
@@ -483,7 +473,7 @@ namespace LANNetworkSimulation
             {
                 Text = "Quản lý kết nối",
                 Location = new Point(10, y),
-                Size = new Size(280, 160), // Tăng kích thước để chứa nút cập nhật
+                Size = new Size(280, 160),
                 BackColor = Color.White
             };
             controlPanel.Controls.Add(connectionGroup);
@@ -537,7 +527,6 @@ namespace LANNetworkSimulation
             };
             connectionGroup.Controls.Add(btnRemoveConnection);
 
-            // Thêm nút cập nhật kết nối
             btnUpdateConnection = new Button
             {
                 Text = "Cập nhật kết nối",
@@ -663,9 +652,16 @@ namespace LANNetworkSimulation
                     }
 
                     var device = network.AddDevice(name, selectedDeviceType, e.Location);
+                    if (device == null)
+                    {
+                        MessageBox.Show("Tên thiết bị đã tồn tại. Vui lòng chọn tên khác.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
                     isAddingDevice = false;
                     RefreshDeviceLists(cboSource, cboDestination);
                     networkPanel.Invalidate();
+                    txtResult.Text = $"Đã thêm thiết bị: {name} ({selectedDeviceType})";
                 }
                 else if (isAddingConnection)
                 {
@@ -680,7 +676,6 @@ namespace LANNetworkSimulation
                         }
                         else if (device != connectionSource)
                         {
-                            // Tạo kết nối mới
                             double bandwidth, latency;
                             if (!double.TryParse(txtBandwidth.Text, out bandwidth) || bandwidth <= 0)
                             {
@@ -721,21 +716,17 @@ namespace LANNetworkSimulation
                         isDraggingDevice = true;
                         dragOffset = new Point(e.X - selectedDevice.Position.X, e.Y - selectedDevice.Position.Y);
 
-                        // Hiển thị thông tin thiết bị trong các control
                         txtDeviceName.Text = selectedDevice.Name;
                         cboDeviceType.SelectedItem = selectedDevice.Type.ToString();
 
-                        // Cập nhật thông báo
                         txtResult.Text = $"Đã chọn thiết bị: {selectedDevice.Name} (Loại: {selectedDevice.Type})";
 
-                        // Bỏ chọn kết nối nếu đang chọn thiết bị
                         selectedConnection = null;
                         btnRemoveConnection.Enabled = false;
                         btnUpdateConnection.Enabled = false;
                     }
                     else
                     {
-                        // Kiểm tra xem có click vào kết nối không
                         var clickedConnection = network.GetConnectionAt(e.Location);
                         if (clickedConnection != null)
                         {
@@ -743,22 +734,18 @@ namespace LANNetworkSimulation
                             btnRemoveConnection.Enabled = true;
                             btnUpdateConnection.Enabled = true;
 
-                            // Hiển thị thông tin kết nối trong các control
                             txtBandwidth.Text = selectedConnection.Bandwidth.ToString();
                             txtLatency.Text = selectedConnection.Latency.ToString();
 
-                            // Cập nhật thông báo
                             txtResult.Text = $"Đã chọn kết nối: {selectedConnection.Source.Name} ↔ {selectedConnection.Destination.Name}";
                             txtResult.Text += $"\nBăng thông: {selectedConnection.Bandwidth} Mbps, Độ trễ: {selectedConnection.Latency} ms";
 
-                            // Bỏ chọn thiết bị nếu đang chọn kết nối
                             selectedDevice = null;
                             btnRemoveDevice.Enabled = false;
                             btnUpdateDevice.Enabled = false;
                         }
                         else
                         {
-                            // Không chọn thiết bị và kết nối
                             selectedDevice = null;
                             selectedConnection = null;
                             btnRemoveDevice.Enabled = false;
@@ -839,14 +826,17 @@ namespace LANNetworkSimulation
                         MessageBox.Show("Vui lòng nhập tên thiết bị", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
+                    if (name != selectedDevice.Name && network.Devices.Any(d => d.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("Tên thiết bị đã tồn tại. Vui lòng chọn tên khác.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
                     DeviceType newType = (DeviceType)Enum.Parse(typeof(DeviceType), cboDeviceType.SelectedItem.ToString());
 
-                    // Cập nhật thông tin thiết bị
                     selectedDevice.Name = name;
                     selectedDevice.Type = newType;
 
-                    // Cập nhật UI
                     RefreshDeviceLists(cboSource, cboDestination);
                     networkPanel.Invalidate();
 
@@ -871,11 +861,9 @@ namespace LANNetworkSimulation
                         return;
                     }
 
-                    // Cập nhật thông tin kết nối
                     selectedConnection.Bandwidth = bandwidth;
                     selectedConnection.Latency = latency;
 
-                    // Cập nhật UI
                     networkPanel.Invalidate();
 
                     txtResult.Text = $"Đã cập nhật kết nối: {selectedConnection.Source.Name} ↔ {selectedConnection.Destination.Name}";
@@ -948,7 +936,6 @@ namespace LANNetworkSimulation
                     return;
                 }
 
-                // Lấy 3 máy tính đầu tiên làm mục tiêu
                 targets = computers.Take(3).ToList();
 
                 double fileSize;
@@ -1004,10 +991,9 @@ namespace LANNetworkSimulation
                 networkPanel.Invalidate();
             };
 
-            // Xử lý sự kiện khi nhấn nút Reset
+            // Xử lý khi nhấn nút Reset
             btnReset.Click += (sender, e) =>
             {
-                // Hiển thị hộp thoại xác nhận
                 DialogResult result = MessageBox.Show(
                     "Bạn có chắc chắn muốn xóa tất cả thiết bị và kết nối trong mạng?",
                     "Xác nhận reset",
@@ -1016,11 +1002,9 @@ namespace LANNetworkSimulation
 
                 if (result == DialogResult.Yes)
                 {
-                    // Xóa tất cả thiết bị và kết nối
                     network.Devices.Clear();
                     network.Connections.Clear();
 
-                    // Reset các controls và biến toàn cục
                     selectedDevice = null;
                     selectedConnection = null;
                     connectionSource = null;
@@ -1028,16 +1012,13 @@ namespace LANNetworkSimulation
                     isAddingConnection = false;
                     isDraggingDevice = false;
 
-                    // Cập nhật trạng thái các nút
                     btnRemoveDevice.Enabled = false;
                     btnUpdateDevice.Enabled = false;
                     btnRemoveConnection.Enabled = false;
                     btnUpdateConnection.Enabled = false;
 
-                    // Cập nhật danh sách thiết bị trong ComboBox
                     RefreshDeviceLists(cboSource, cboDestination);
 
-                    // Cập nhật thông báo
                     txtResult.Text = "Đã reset mạng. Tất cả thiết bị và kết nối đã được xóa.";
 
                     // Vẽ lại panel mạng
@@ -1087,7 +1068,6 @@ namespace LANNetworkSimulation
             var student1 = network.AddDevice("Sinh viên 1", DeviceType.Computer, new Point(150, 300));
             var student2 = network.AddDevice("Sinh viên 2", DeviceType.Computer, new Point(350, 350));
             var student3 = network.AddDevice("Sinh viên 3", DeviceType.Computer, new Point(550, 300));
-            //var student4 = network.AddDevice("Sinh viên 4", DeviceType.Computer, new Point(650, 150));
 
             // Tạo các kết nối
             network.AddConnection(teacher, switch1, 100, 2);
@@ -1095,7 +1075,6 @@ namespace LANNetworkSimulation
             network.AddConnection(switch1, router, 100, 5);
             network.AddConnection(switch2, switch3, 1000, 1);
             network.AddConnection(switch2, router, 100, 3);
-            //network.AddConnection(switch3, student4, 100, 2);
             network.AddConnection(switch3, router, 100, 4);
             network.AddConnection(router, student1, 100, 3);
             network.AddConnection(router, student2, 100, 2);
