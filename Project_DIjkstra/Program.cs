@@ -343,6 +343,14 @@ namespace LANNetworkSimulation
         private bool isDraggingDevice = false;
         private Point dragOffset;
 
+        // Thêm các control cho việc cập nhật
+        private TextBox txtDeviceName;
+        private ComboBox cboDeviceType;
+        private TextBox txtBandwidth;
+        private TextBox txtLatency;
+        private Button btnUpdateDevice;
+        private Button btnUpdateConnection;
+
         public MainForm()
         {
             InitializeComponent();
@@ -380,19 +388,30 @@ namespace LANNetworkSimulation
                 Location = new Point(10, 620),
                 Size = new Size(1160, 130),
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor= Color.White,
+                BackColor = Color.White,
             };
             this.Controls.Add(resultPanel);
 
             // Các control trong Panel điều khiển
             int y = 10;
 
+            Button btnReset = new Button
+            {
+                Text = "Reset Mạng",
+                Location = new Point(10, 560), // Di chuyển xuống dưới trong panel điều khiển
+                Size = new Size(280, 30),
+                BackColor = Color.Red,
+                ForeColor = Color.White,
+                Font = new Font("Arial", 10, FontStyle.Bold)
+            };
+            controlPanel.Controls.Add(btnReset);
+
             // GroupBox thiết bị
             GroupBox deviceGroup = new GroupBox
             {
                 Text = "Quản lý thiết bị",
                 Location = new Point(10, y),
-                Size = new Size(280, 140),
+                Size = new Size(280, 160), // Tăng kích thước để chứa nút cập nhật
                 BackColor = Color.White
             };
             controlPanel.Controls.Add(deviceGroup);
@@ -405,7 +424,7 @@ namespace LANNetworkSimulation
             };
             deviceGroup.Controls.Add(lblDeviceName);
 
-            TextBox txtDeviceName = new TextBox
+            txtDeviceName = new TextBox
             {
                 Location = new Point(90, 20),
                 Size = new Size(180, 20)
@@ -420,7 +439,7 @@ namespace LANNetworkSimulation
             };
             deviceGroup.Controls.Add(lblDeviceType);
 
-            ComboBox cboDeviceType = new ComboBox
+            cboDeviceType = new ComboBox
             {
                 Location = new Point(90, 50),
                 Size = new Size(180, 20),
@@ -447,14 +466,24 @@ namespace LANNetworkSimulation
             };
             deviceGroup.Controls.Add(btnRemoveDevice);
 
-            y += 150;
+            // Thêm nút cập nhật thiết bị
+            btnUpdateDevice = new Button
+            {
+                Text = "Cập nhật thiết bị",
+                Location = new Point(10, 120),
+                Size = new Size(260, 30),
+                Enabled = false
+            };
+            deviceGroup.Controls.Add(btnUpdateDevice);
+
+            y += 170;
 
             // GroupBox kết nối
             GroupBox connectionGroup = new GroupBox
             {
                 Text = "Quản lý kết nối",
                 Location = new Point(10, y),
-                Size = new Size(280, 140),
+                Size = new Size(280, 160), // Tăng kích thước để chứa nút cập nhật
                 BackColor = Color.White
             };
             controlPanel.Controls.Add(connectionGroup);
@@ -467,7 +496,7 @@ namespace LANNetworkSimulation
             };
             connectionGroup.Controls.Add(lblBandwidth);
 
-            TextBox txtBandwidth = new TextBox
+            txtBandwidth = new TextBox
             {
                 Location = new Point(130, 20),
                 Size = new Size(140, 20),
@@ -483,7 +512,7 @@ namespace LANNetworkSimulation
             };
             connectionGroup.Controls.Add(lblLatency);
 
-            TextBox txtLatency = new TextBox
+            txtLatency = new TextBox
             {
                 Location = new Point(130, 50),
                 Size = new Size(140, 20),
@@ -508,14 +537,24 @@ namespace LANNetworkSimulation
             };
             connectionGroup.Controls.Add(btnRemoveConnection);
 
-            y += 150;
+            // Thêm nút cập nhật kết nối
+            btnUpdateConnection = new Button
+            {
+                Text = "Cập nhật kết nối",
+                Location = new Point(10, 120),
+                Size = new Size(260, 30),
+                Enabled = false
+            };
+            connectionGroup.Controls.Add(btnUpdateConnection);
+
+            y += 170;
 
             // GroupBox tìm đường đi
             GroupBox pathFindingGroup = new GroupBox
             {
                 Text = "Tìm đường đi",
                 Location = new Point(10, y),
-                Size = new Size(280, 280),
+                Size = new Size(280, 200),
                 BackColor = Color.White,
             };
             controlPanel.Controls.Add(pathFindingGroup);
@@ -605,17 +644,6 @@ namespace LANNetworkSimulation
             };
             resultPanel.Controls.Add(txtResult);
 
-            Button btnReset = new Button
-            {
-                Text = "Reset Mạng",
-                Location = new Point(10, 200), // Điều chỉnh vị trí phù hợp
-                Size = new Size(260, 30),
-                BackColor = Color.Red,
-                ForeColor = Color.White,
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
-            pathFindingGroup.Controls.Add(btnReset);
-
             // Xử lý sự kiện
             networkPanel.Paint += (sender, e) =>
             {
@@ -683,32 +711,60 @@ namespace LANNetworkSimulation
                 }
                 else
                 {
-                    // Chọn thiết bị để di chuyển hoặc xóa
-                    selectedDevice = network.GetDeviceAt(e.Location);
-                    if (selectedDevice != null)
+                    // Chọn thiết bị để di chuyển, xóa hoặc cập nhật
+                    var clickedDevice = network.GetDeviceAt(e.Location);
+                    if (clickedDevice != null)
                     {
+                        selectedDevice = clickedDevice;
                         btnRemoveDevice.Enabled = true;
+                        btnUpdateDevice.Enabled = true;
                         isDraggingDevice = true;
                         dragOffset = new Point(e.X - selectedDevice.Position.X, e.Y - selectedDevice.Position.Y);
+
+                        // Hiển thị thông tin thiết bị trong các control
+                        txtDeviceName.Text = selectedDevice.Name;
+                        cboDeviceType.SelectedItem = selectedDevice.Type.ToString();
+
+                        // Cập nhật thông báo
+                        txtResult.Text = $"Đã chọn thiết bị: {selectedDevice.Name} (Loại: {selectedDevice.Type})";
 
                         // Bỏ chọn kết nối nếu đang chọn thiết bị
                         selectedConnection = null;
                         btnRemoveConnection.Enabled = false;
+                        btnUpdateConnection.Enabled = false;
                     }
                     else
                     {
-                        btnRemoveDevice.Enabled = false;
-
                         // Kiểm tra xem có click vào kết nối không
-                        selectedConnection = network.GetConnectionAt(e.Location);
-                        if (selectedConnection != null)
+                        var clickedConnection = network.GetConnectionAt(e.Location);
+                        if (clickedConnection != null)
                         {
+                            selectedConnection = clickedConnection;
                             btnRemoveConnection.Enabled = true;
+                            btnUpdateConnection.Enabled = true;
+
+                            // Hiển thị thông tin kết nối trong các control
+                            txtBandwidth.Text = selectedConnection.Bandwidth.ToString();
+                            txtLatency.Text = selectedConnection.Latency.ToString();
+
+                            // Cập nhật thông báo
                             txtResult.Text = $"Đã chọn kết nối: {selectedConnection.Source.Name} ↔ {selectedConnection.Destination.Name}";
+                            txtResult.Text += $"\nBăng thông: {selectedConnection.Bandwidth} Mbps, Độ trễ: {selectedConnection.Latency} ms";
+
+                            // Bỏ chọn thiết bị nếu đang chọn kết nối
+                            selectedDevice = null;
+                            btnRemoveDevice.Enabled = false;
+                            btnUpdateDevice.Enabled = false;
                         }
                         else
                         {
+                            // Không chọn thiết bị và kết nối
+                            selectedDevice = null;
+                            selectedConnection = null;
+                            btnRemoveDevice.Enabled = false;
+                            btnUpdateDevice.Enabled = false;
                             btnRemoveConnection.Enabled = false;
+                            btnUpdateConnection.Enabled = false;
                         }
                     }
                 }
@@ -744,6 +800,7 @@ namespace LANNetworkSimulation
                     network.RemoveDevice(selectedDevice);
                     selectedDevice = null;
                     btnRemoveDevice.Enabled = false;
+                    btnUpdateDevice.Enabled = false;
                     RefreshDeviceLists(cboSource, cboDestination);
                     networkPanel.Invalidate();
                     txtResult.Text = "Đã xóa thiết bị và các kết nối liên quan";
@@ -766,7 +823,63 @@ namespace LANNetworkSimulation
                     txtResult.Text = $"Đã xóa kết nối: {selectedConnection.Source.Name} ↔ {selectedConnection.Destination.Name}";
                     selectedConnection = null;
                     btnRemoveConnection.Enabled = false;
+                    btnUpdateConnection.Enabled = false;
                     networkPanel.Invalidate();
+                }
+            };
+
+            // Xử lý cập nhật thiết bị
+            btnUpdateDevice.Click += (sender, e) =>
+            {
+                if (selectedDevice != null)
+                {
+                    string name = txtDeviceName.Text.Trim();
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        MessageBox.Show("Vui lòng nhập tên thiết bị", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    DeviceType newType = (DeviceType)Enum.Parse(typeof(DeviceType), cboDeviceType.SelectedItem.ToString());
+
+                    // Cập nhật thông tin thiết bị
+                    selectedDevice.Name = name;
+                    selectedDevice.Type = newType;
+
+                    // Cập nhật UI
+                    RefreshDeviceLists(cboSource, cboDestination);
+                    networkPanel.Invalidate();
+
+                    txtResult.Text = $"Đã cập nhật thiết bị: {selectedDevice.Name} (Loại: {selectedDevice.Type})";
+                }
+            };
+
+            // Xử lý cập nhật kết nối
+            btnUpdateConnection.Click += (sender, e) =>
+            {
+                if (selectedConnection != null)
+                {
+                    double bandwidth, latency;
+                    if (!double.TryParse(txtBandwidth.Text, out bandwidth) || bandwidth <= 0)
+                    {
+                        MessageBox.Show("Vui lòng nhập băng thông hợp lệ", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    if (!double.TryParse(txtLatency.Text, out latency) || latency <= 0)
+                    {
+                        MessageBox.Show("Vui lòng nhập độ trễ hợp lệ", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Cập nhật thông tin kết nối
+                    selectedConnection.Bandwidth = bandwidth;
+                    selectedConnection.Latency = latency;
+
+                    // Cập nhật UI
+                    networkPanel.Invalidate();
+
+                    txtResult.Text = $"Đã cập nhật kết nối: {selectedConnection.Source.Name} ↔ {selectedConnection.Destination.Name}";
+                    txtResult.Text += $"\nBăng thông mới: {bandwidth} Mbps, Độ trễ mới: {latency} ms";
                 }
             };
 
@@ -917,7 +1030,9 @@ namespace LANNetworkSimulation
 
                     // Cập nhật trạng thái các nút
                     btnRemoveDevice.Enabled = false;
+                    btnUpdateDevice.Enabled = false;
                     btnRemoveConnection.Enabled = false;
+                    btnUpdateConnection.Enabled = false;
 
                     // Cập nhật danh sách thiết bị trong ComboBox
                     RefreshDeviceLists(cboSource, cboDestination);
